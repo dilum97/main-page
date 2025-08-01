@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Seettuwa Contributions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+      margin: 0;
+      background: linear-gradient(to bottom right, #1e1e1e, #2a2a2a);
+      color: #fff;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #00ffc8;
+    }
+
+    table {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0, 255, 200, 0.2);
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: left;
+    }
+
+    th {
+      background: rgba(0, 0, 0, 0.3);
+      color: #00ffc8;
+    }
+
+    td {
+      color: #eee;
+    }
+
+    .custom-checkbox {
+      width: 20px;
+      height: 20px;
+      appearance: none;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      cursor: not-allowed;
+      position: relative;
+      background-color: yellow;
+    }
+
+    .custom-checkbox:checked {
+      background-color: #00ff88;
+      border-color: #00ff88;
+    }
+
+    .custom-checkbox:checked::after {
+      content: "✔";
+      position: absolute;
+      top: 0;
+      left: 4px;
+      font-size: 14px;
+      color: #000;
+    }
+
+    #subtotal {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #00ffc8;
+    }
+
+    @media (max-width: 600px) {
+      table, th, td {
+        font-size: 14px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      .custom-checkbox {
+        width: 18px;
+        height: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h2>January - Geethika</h2>
+
+<table id="data-table">
+  <thead>
+    <tr>
+      <th>No</th>
+      <th>Name</th>
+      <th>Amount</th>
+      <th>Paid</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<div id="subtotal">Total Paid: Rs. 0</div>
+
+<script>
+  const sheetUrl = "https://opensheet.elk.sh/1uZk0p6Zt3i1-CeoHnllTVkQz64wTO3YB7aIrAZBaRzo/Sheet1";
+
+  fetch(sheetUrl)
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.querySelector("#data-table tbody");
+      let totalPaid = 0;
+
+      data.forEach(row => {
+        const tr = document.createElement("tr");
+
+        // No
+        const noTd = document.createElement("td");
+        noTd.textContent = row.No || "";
+        tr.appendChild(noTd);
+
+        // Name
+        const nameTd = document.createElement("td");
+        nameTd.textContent = row.Name || "";
+        tr.appendChild(nameTd);
+
+        // Amount
+        const amountValue = row.Amount ? parseInt(row.Amount.replace(/[^0-9]/g, "")) : 10000;
+        const amountTd = document.createElement("td");
+        amountTd.textContent = "Rs. " + amountValue.toLocaleString("en-LK");
+        tr.appendChild(amountTd);
+
+        // Paid
+        const paidTd = document.createElement("td");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "custom-checkbox";
+        checkbox.disabled = true;
+        if (row.Paid && row.Paid.trim().toLowerCase() === "done") {
+          checkbox.checked = true;
+          totalPaid += amountValue;
+        }
+        paidTd.appendChild(checkbox);
+        tr.appendChild(paidTd);
+
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById("subtotal").textContent = "Total Paid: Rs. " + totalPaid.toLocaleString("en-LK");
+    })
+    .catch(error => {
+      console.error("Error loading sheet data:", error);
+    });
+</script>
+
+</body>
+</html>
